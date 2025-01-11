@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: dca_processor
+Version: 0.1.0
+Requires-Python: >=3.8
+Requires-Dist: psycopg2-binary>=2.9.0
+Requires-Dist: requests>=2.26.0
+Requires-Dist: base58>=2.1.0

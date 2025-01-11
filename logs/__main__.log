@@ -1,0 +1,614 @@
+2024-12-30 22:59:10,781 - __main__ - ERROR - Error in main: 'DatabaseQueries' object has no attribute 'load_solana_dca_data'
+2024-12-30 22:59:10,782 - __main__ - ERROR - 'DatabaseQueries' object has no attribute 'load_solana_dca_data'
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 112, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 31, in run_dashboard
+    df = db_queries.load_solana_dca_data()  # You'd have such a method in db.queries
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DatabaseQueries' object has no attribute 'load_solana_dca_data'
+2024-12-30 23:18:57,551 - __main__ - ERROR - Error in main: 'DatabaseQueries' object has no attribute 'db_conn'
+2024-12-30 23:18:57,557 - __main__ - ERROR - 'DatabaseQueries' object has no attribute 'db_conn'
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 112, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 31, in run_dashboard
+    df = db_queries.load_solana_dca_data()  # You'd have such a method in db.queries
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 355, in load_solana_dca_data
+    df = pd.read_sql(query, self.db_conn.connection)
+                            ^^^^^^^^^^^^
+AttributeError: 'DatabaseQueries' object has no attribute 'db_conn'
+2024-12-31 14:00:55,191 - __main__ - ERROR - Error in main: Value of 'color' is not the name of a column in 'data_frame'. Expected one of ['day', 'output_mint', 'tx_count', 'total_out'] but received: token_name
+2024-12-31 14:00:55,191 - __main__ - ERROR - Value of 'color' is not the name of a column in 'data_frame'. Expected one of ['day', 'output_mint', 'tx_count', 'total_out'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 109, in run_dashboard
+    show_most_out_tokens_per_day(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 27, in show_most_out_tokens_per_day
+    fig = px.bar(
+          ^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'color' is not the name of a column in 'data_frame'. Expected one of ['day', 'output_mint', 'tx_count', 'total_out'] but received: token_name
+2024-12-31 14:01:02,394 - __main__ - ERROR - Error in main: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+2024-12-31 14:01:02,394 - __main__ - ERROR - Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 111, in run_dashboard
+    show_top10_tokens_by_outflow(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 44, in show_top10_tokens_by_outflow
+    fig = px.bar(df, x="token_name", y="total_out", title="Top 10 Tokens by Outflow")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+2024-12-31 14:01:10,842 - __main__ - ERROR - Error in main: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'out_count', 'in_count', 'difference'] but received: token_name
+2024-12-31 14:01:10,844 - __main__ - ERROR - Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'out_count', 'in_count', 'difference'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 113, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 58, in show_tokens_out_more_than_in
+    fig = px.bar(
+          ^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'out_count', 'in_count', 'difference'] but received: token_name
+2024-12-31 14:01:23,726 - __main__ - ERROR - Error in main: Value of 'color' is not the name of a column in 'data_frame'. Expected one of ['day', 'output_mint', 'tx_count', 'total_out'] but received: token_name
+2024-12-31 14:01:23,728 - __main__ - ERROR - Value of 'color' is not the name of a column in 'data_frame'. Expected one of ['day', 'output_mint', 'tx_count', 'total_out'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 109, in run_dashboard
+    show_most_out_tokens_per_day(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 27, in show_most_out_tokens_per_day
+    fig = px.bar(
+          ^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'color' is not the name of a column in 'data_frame'. Expected one of ['day', 'output_mint', 'tx_count', 'total_out'] but received: token_name
+2024-12-31 14:01:36,539 - __main__ - ERROR - Error in main: Value of 'color' is not the name of a column in 'data_frame'. Expected one of ['day', 'output_mint', 'tx_count', 'total_out'] but received: token_name
+2024-12-31 14:01:36,540 - __main__ - ERROR - Value of 'color' is not the name of a column in 'data_frame'. Expected one of ['day', 'output_mint', 'tx_count', 'total_out'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 109, in run_dashboard
+    show_most_out_tokens_per_day(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 27, in show_most_out_tokens_per_day
+    fig = px.bar(
+          ^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'color' is not the name of a column in 'data_frame'. Expected one of ['day', 'output_mint', 'tx_count', 'total_out'] but received: token_name
+2024-12-31 15:37:48,080 - __main__ - ERROR - Error in main: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+2024-12-31 15:37:48,080 - __main__ - ERROR - Error in main: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+2024-12-31 15:37:48,081 - __main__ - ERROR - Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 113, in run_dashboard
+    show_top10_tokens_by_outflow(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 46, in show_top10_tokens_by_outflow
+    fig = px.bar(df, x="token_name", y="total_out", title="Top 10 Tokens by Outflow")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+2024-12-31 15:37:48,081 - __main__ - ERROR - Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 113, in run_dashboard
+    show_top10_tokens_by_outflow(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 46, in show_top10_tokens_by_outflow
+    fig = px.bar(df, x="token_name", y="total_out", title="Top 10 Tokens by Outflow")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+2024-12-31 15:37:55,397 - __main__ - ERROR - Error in main: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'out_count', 'in_count', 'difference'] but received: token_name
+2024-12-31 15:37:55,397 - __main__ - ERROR - Error in main: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'out_count', 'in_count', 'difference'] but received: token_name
+2024-12-31 15:37:55,401 - __main__ - ERROR - Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'out_count', 'in_count', 'difference'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 115, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 60, in show_tokens_out_more_than_in
+    fig = px.bar(
+          ^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'out_count', 'in_count', 'difference'] but received: token_name
+2024-12-31 15:37:55,401 - __main__ - ERROR - Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'out_count', 'in_count', 'difference'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 115, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 60, in show_tokens_out_more_than_in
+    fig = px.bar(
+          ^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'out_count', 'in_count', 'difference'] but received: token_name
+2024-12-31 16:05:00,998 - __main__ - ERROR - Error in main: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+2024-12-31 16:05:00,999 - __main__ - ERROR - Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 111, in run_dashboard
+    show_top10_tokens_by_outflow(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 46, in show_top10_tokens_by_outflow
+    fig = px.bar(df, x="token_name", y="total_out", title="Top 10 Tokens by Outflow")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+2024-12-31 16:05:43,063 - __main__ - ERROR - Error in main: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+2024-12-31 16:05:43,064 - __main__ - ERROR - Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 111, in run_dashboard
+    show_top10_tokens_by_outflow(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 46, in show_top10_tokens_by_outflow
+    fig = px.bar(df, x="token_name", y="total_out", title="Top 10 Tokens by Outflow")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_chart_types.py", line 373, in bar
+    return make_figure(
+           ^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 2117, in make_figure
+    args = build_dataframe(args, constructor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1513, in build_dataframe
+    df_output, wide_id_vars = process_args_into_dataframe(
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\plotly\express\_core.py", line 1234, in process_args_into_dataframe
+    raise ValueError(err_msg)
+ValueError: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['output_mint', 'total_out'] but received: token_name
+2025-01-01 19:34:16,171 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:34:16,172 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:34:56,942 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:34:56,944 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:19,473 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:19,475 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:23,541 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:23,542 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:24,132 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:24,132 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:24,420 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:24,421 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:24,879 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:24,880 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:25,181 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:25,182 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:25,507 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:25,508 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:25,658 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:25,659 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:25,926 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:25,927 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:26,628 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:26,630 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:26,982 - __main__ - ERROR - Error in main: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2025-01-01 19:36:26,982 - __main__ - ERROR - function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+Traceback (most recent call last):
+  File "C:\Users\sandr\DataspellProjects\dca_processor\main.py", line 23, in main
+    run_dashboard(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 139, in run_dashboard
+    show_tokens_out_more_than_in(db_queries)
+  File "C:\Users\sandr\DataspellProjects\dca_processor\dashboard.py", line 66, in show_tokens_out_more_than_in
+    df = db_queries.get_tokens_out_more_than_in(start_date, end_date, top_n)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sandr\DataspellProjects\dca_processor\db\queries.py", line 629, in get_tokens_out_more_than_in
+    cursor.execute(query, (start_date, end_date, top_n))
+  File "C:\Users\sandr\DataspellProjects\dca_processor\venv\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedFunction: function date(bigint) does not exist
+LINE 4:                     DATE(block_time) as trade_date,
+                            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
