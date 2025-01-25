@@ -193,39 +193,29 @@ class DatabaseQueries:
 
         return True
 
-    def process_dextools_response(self, info_data: dict, audit_data: dict) -> DexToolsTokenInfo:
-        """
-        Given two responses:
-          - info_data: from GET /v2/token/{chain}/{address}
-          - audit_data: from GET /v2/token/{chain}/{address}/audit
-        Return a single DexToolsTokenInfo object capturing all fields.
-        """
-        if "data" not in info_data:
-            logger.warning("Base token info missing 'data' key.")
-            return None
-        base = info_data["data"]
-
-        # If "data" is missing from the audit response, use an empty dict or handle gracefully
-        audit = audit_data.get("data", {})
+    def process_dextools_response(self, info_data: dict, audit_data: dict):
+        """Processes API responses to extract token info."""
+        base = info_data.get("data", {}) or {}
+        audit = audit_data.get("data", {}) or {}
 
         # Parse base fields
-        token_address = strip_control_chars(base.get("address"))
-        token_name = strip_control_chars(base.get("name"))
-        token_symbol = strip_control_chars(base.get("symbol"))
+        token_address = strip_control_chars(base.get("address", "") or "")
+        token_name = strip_control_chars(base.get("name", "") or "")
+        token_symbol = strip_control_chars(base.get("symbol", "") or "")
         token_logo = base.get("logo")
         token_desc = base.get("description")
-        creation_time = base.get("creationTime")    # "2024-11-13T20:44:16.067Z"
+        creation_time = base.get("creationTime")
         creation_block = base.get("creationBlock")
         decimals = base.get("decimals")
         social_info = base.get("socialInfo", {})
 
-        # Convert creation_time string -> datetime if needed
+        # Convert creation_time to datetime
         dt_creation = None
         if creation_time:
             try:
                 dt_creation = datetime.fromisoformat(creation_time.replace("Z", "+00:00"))
             except Exception:
-                logger.warning(f"Failed to parse creationTime: {creation_time}")
+                logger.warning(f"Invalid creationTime format: {creation_time}")
 
         # Parse audit fields
         is_open_source = audit.get("isOpenSource")
@@ -234,24 +224,23 @@ class DatabaseQueries:
         is_proxy = audit.get("isProxy")
         slippage_modifiable = audit.get("slippageModifiable")
         is_blacklisted = audit.get("isBlacklisted")
-        sell_tax = audit.get("sellTax", {})  # { "min": null, "max": null, "status": "unknown" }
+        sell_tax = audit.get("sellTax", {})
         buy_tax = audit.get("buyTax", {})
         is_contract_renounced = audit.get("isContractRenounced")
         is_potentially_scam = audit.get("isPotentiallyScam")
-        updated_at_str = audit.get("updatedAt")  # "2024-11-13T21:11:41.249Z"
+        updated_at_str = audit.get("updatedAt")
 
         dt_updated = None
         if updated_at_str:
             try:
                 dt_updated = datetime.fromisoformat(updated_at_str.replace("Z", "+00:00"))
             except Exception:
-                logger.warning(f"Failed to parse updatedAt: {updated_at_str}")
+                logger.warning(f"Invalid updatedAt format: {updated_at_str}")
 
-        # Decide if token is suspicious
-        # e.g., if is_potentially_scam == "yes" or is_blacklisted == "yes"
-        suspicious_flag = (is_potentially_scam == "yes" or is_blacklisted == "yes")
+        # Determine if token is suspicious
+        suspicious_flag = is_potentially_scam == "yes" or is_blacklisted == "yes"
 
-        dex_info = DexToolsTokenInfo(
+        return DexToolsTokenInfo(
             token=token_address,
             name=token_name,
             symbol=token_symbol,
@@ -275,7 +264,6 @@ class DatabaseQueries:
             is_suspicious=suspicious_flag
         )
 
-        return dex_info
 
 
     def update_token_info_with_rate_limit(
@@ -396,13 +384,12 @@ class DatabaseQueries:
             logger.error("Error traceback: ", exc_info=True)
             raise
     def update_incomplete_token_info(self, api_url: str, rate_limit: int, api_key: str = ""):
-        """Update token records where symbol is null or empty"""
+        """Update token records where symbol or name is null or empty."""
         with self.db.get_cursor() as cur:
             cur.execute("""
                 SELECT token 
                 FROM token_info 
-                WHERE symbol IS NULL OR symbol = ''
-                OR name IS NULL OR name = ''
+                WHERE symbol IS NULL OR symbol = '' OR name IS NULL OR name = ''
             """)
             incomplete_tokens = [row['token'] for row in cur.fetchall()]
 
@@ -412,7 +399,6 @@ class DatabaseQueries:
 
         logger.info(f"Found {len(incomplete_tokens)} incomplete token records")
 
-        # Process in batches
         batch_size = min(50, rate_limit)
         for i in range(0, len(incomplete_tokens), batch_size):
             batch = incomplete_tokens[i:i + batch_size]
@@ -426,51 +412,45 @@ class DatabaseQueries:
 
             for token in batch:
                 try:
+                    logger.debug(f"Processing token: {token}")
                     base_url = f"{api_url}/v2/token/solana/{token}"
-                    audit_url = f"{api_url}/v2/token/solana/{token}/audit"
+                    audit_url = f"{base_url}/audit"
                     headers = {"X-API-KEY": api_key}
 
                     info_resp = requests.get(base_url, headers=headers)
                     audit_resp = requests.get(audit_url, headers=headers)
 
-                    if info_resp.status_code == 200 and audit_resp.status_code == 200:
+                    if info_resp.status_code == 200:
                         info_data = info_resp.json()
-                        audit_data = audit_resp.json()
-
-                        dex_info = self.process_dextools_response(info_data, audit_data)
-                        if dex_info and dex_info.token:
-                            if dex_info.is_suspicious:
-                                suspicious_tokens.append(dex_info)
-                            else:
-                                valid_tokens.append(dex_info)
-                        else:
-                            suspicious_tokens.append(DexToolsTokenInfo(token=token, is_suspicious=True))
                     else:
-                        logger.warning(f"DexTools call failed for {token}")
-                        suspicious_tokens.append(DexToolsTokenInfo(token=token, is_suspicious=True))
+                        logger.warning(f"Info API call failed for token {token}")
+                        info_data = {}
+
+                    if audit_resp.status_code == 200:
+                        audit_data = audit_resp.json()
+                    else:
+                        logger.warning(f"Audit API call failed for token {token}")
+                        audit_data = {}
+
+                    dex_info = self.process_dextools_response(info_data, audit_data)
+                    if dex_info:
+                        if dex_info.is_suspicious:
+                            suspicious_tokens.append(dex_info)
+                        else:
+                            valid_tokens.append(dex_info)
 
                 except Exception as e:
-                    logger.error(f"Error processing token {token}: {str(e)}")
-                    suspicious_tokens.append(DexToolsTokenInfo(token=token, is_suspicious=True))
+                    logger.error(f"Error processing token {token}: {str(e)}", exc_info=True)
 
                 time.sleep(1)
 
-            # Store the results
             if valid_tokens:
-                try:
-                    self.store_token_info(valid_tokens)
-                    logger.info(f"Updated {len(valid_tokens)} valid tokens (batch {i//batch_size + 1})")
-                except Exception as e:
-                    logger.error(f"Error storing valid tokens: {str(e)}")
+                self.store_token_info(valid_tokens)
+                logger.info(f"Updated {len(valid_tokens)} valid tokens (batch {i // batch_size + 1})")
 
             if suspicious_tokens:
-                try:
-                    self.store_token_info(suspicious_tokens)
-                    logger.info(f"Updated {len(suspicious_tokens)} suspicious tokens (batch {i//batch_size + 1})")
-                except Exception as e:
-                    logger.error(f"Error storing suspicious tokens: {str(e)}")
-
-            time.sleep(1)
+                self.store_token_info(suspicious_tokens)
+                logger.info(f"Updated {len(suspicious_tokens)} suspicious tokens (batch {i // batch_size + 1})")
 
         logger.info("Finished updating incomplete token records.")
 
@@ -482,6 +462,8 @@ class DatabaseQueries:
                 cur.execute("CALL process_dca_transactions_open();")
                 logger.info("Calling stored procedure: process_dca_transactions_close()")
                 cur.execute("CALL process_dca_transactions_close();")
+                logger.info("Calling stored procedure: process_dca_transactions_close()")
+                cur.execute("CALL process_dca_transactions_closedca();")
             logger.info("Stored procedures executed successfully.")
         except Exception as e:
             logger.error(f"Error calling stored procedures: {str(e)}")

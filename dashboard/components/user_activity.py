@@ -61,9 +61,8 @@ class UserActivityDisplay:
             current_page_df = df.iloc[start_idx:end_idx].copy()
 
             # Format the user addresses to be more readable
-            current_page_df['user_address'] = current_page_df['user_address'].apply(
-                lambda x: f"{x[:6]}...{x[-4:]}"
-            )
+            #current_page_df['user_address'] = current_page_df['user_address'].apply(
+                #lambda x: f"{x[:6]}...{x[-4:]}")
 
             # Rename columns for display
             current_page_df.columns = ['User Address', 'Transaction Count']

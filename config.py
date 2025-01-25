@@ -1,3 +1,4 @@
+# config.py
 import os
 from dataclasses import dataclass
 from typing import Optional
@@ -10,12 +11,10 @@ class DatabaseConfig:
     user: str
     password: str
 
-
 @dataclass
 class QuicknodeConfig:
     api_url: str
     api_key: str
-
 
 @dataclass
 class DexToolsConfig:
@@ -23,15 +22,21 @@ class DexToolsConfig:
     api_key: str
     rate_limit: int = 300
 
+@dataclass
+class BirdeyeConfig:
+    api_url: str
+    api_key: str
+    rate_limit: float = 0.5
+    max_concurrent_requests: int = 5
 
 @dataclass
 class Config:
     db: DatabaseConfig
     quicknode: QuicknodeConfig
     dextools: DexToolsConfig
+    birdeye: BirdeyeConfig
     log_level: str = "INFO"
     batch_size: int = 1
-
 
 def load_config() -> Config:
     """Load configuration from environment variables"""
@@ -51,6 +56,12 @@ def load_config() -> Config:
             api_url=os.getenv('DEXTOOLS_API_URL', 'https://public-api.dextools.io/trial'),
             api_key=os.getenv('DEXTOOLS_API_KEY', 'YnPqmXSgoWafyeBqJT6oa1xfBjHVugQM4lzfP2pE'),
             rate_limit=int(os.getenv('DEXTOOLS_RATE_LIMIT', '1'))
+        ),
+        birdeye=BirdeyeConfig(
+            api_url=os.getenv('BIRDEYE_API_URL', 'https://public-api.birdeye.so'),
+            api_key=os.getenv('BIRDEYE_API_KEY', 'd7cb9110685b4c00b81d27cca83b5c9e'),
+            rate_limit=float(os.getenv('BIRDEYE_RATE_LIMIT', '0.5')),
+            max_concurrent_requests=int(os.getenv('BIRDEYE_MAX_CONCURRENT', '5'))
         ),
         log_level=os.getenv('LOG_LEVEL', 'INFO'),
         batch_size=int(os.getenv('BATCH_SIZE', '1'))
