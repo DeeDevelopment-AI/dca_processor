@@ -149,3 +149,69 @@ class DexToolsTokenInfo:
             is_suspicious=suspicious
         )
 
+
+from dataclasses import dataclass, field
+from typing import Optional, Dict, Any
+
+
+@dataclass
+class DexToolsTokenDetails:
+    token: str
+    chain: str
+    circulating_supply: Optional[float] = None
+    total_supply: Optional[float] = None
+    mcap: Optional[float] = None
+    fdv: Optional[float] = None
+    holders: Optional[int] = None
+    transactions: Optional[int] = None
+
+    price: Optional[float] = None
+    price_chain: Optional[float] = None
+    price_5m: Optional[float] = None
+    variation_5m: Optional[float] = None
+    price_1h: Optional[float] = None
+    variation_1h: Optional[float] = None
+    price_6h: Optional[float] = None
+    variation_6h: Optional[float] = None
+    price_24h: Optional[float] = None
+    variation_24h: Optional[float] = None
+
+    @classmethod
+    def from_dict(cls, address: str, chain: str, info_data: Dict, price_data: Dict) -> "DexToolsTokenDetails":
+        """
+        Create a DexToolsTokenDetails object from the given API responses.
+
+        Args:
+            address (str): The token address.
+            chain (str): The blockchain chain (e.g., "solana", "ethereum").
+            info_data (Dict): Data from the `/info` endpoint.
+            price_data (Dict): Data from the `/price` endpoint.
+
+        Returns:
+            DexToolsTokenDetails: The populated dataclass instance.
+        """
+        # Extract data from the 'data' key in the responses
+        info = info_data.get("data", {})
+        price = price_data.get("data", {})
+
+        return cls(
+            token=address,
+            chain=chain,
+            circulating_supply=info.get("circulatingSupply"),
+            total_supply=info.get("totalSupply"),
+            mcap=info.get("mcap"),
+            fdv=info.get("fdv"),
+            holders=info.get("holders"),
+            transactions=info.get("transactions"),
+            price=price.get("price"),
+            price_chain=price.get("priceChain"),
+            price_5m=price.get("price5m"),
+            variation_5m=price.get("variation5m"),
+            price_1h=price.get("price1h"),
+            variation_1h=price.get("variation1h"),
+            price_6h=price.get("price6h"),
+            variation_6h=price.get("variation6h"),
+            price_24h=price.get("price24h"),
+            variation_24h=price.get("variation24h"),
+        )
+

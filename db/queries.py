@@ -1,5 +1,5 @@
 from typing import List, Optional, Dict, Any
-from models import BlockGap, DCATransaction, DexToolsTokenInfo
+from models import BlockGap, DCATransaction, DexToolsTokenInfo, DexToolsTokenDetails
 from db.connection import DatabaseConnection
 import time
 import requests
@@ -264,6 +264,92 @@ class DatabaseQueries:
             is_suspicious=suspicious_flag
         )
 
+    def get_recent_transactions(self, n: int) -> pd.DataFrame:
+        """
+        Calls the get_recent_transactions_hours stored procedure with the given parameter
+        and returns the result as a pandas DataFrame.
+
+        Args:
+            n (int): The number of hours to look back for transactions.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the results of the query.
+        """
+        try:
+            logger.info(f"Fetching recent transactions for the past {n} hours.")
+
+            # Define the SQL call for the stored procedure
+            query = "SELECT * FROM get_recent_transactions_hours(%s);"
+
+            # Execute the query and fetch results
+            with self.db.get_cursor() as cursor:
+                cursor.execute(query, (n,))
+                results = cursor.fetchall()
+
+            # Convert the results into a DataFrame
+            df = pd.DataFrame(results, columns=[
+                "dca", "user_address", "open_input_mint", "open_output_mint",
+                "close_input_mint", "close_output_mint", "open_signature", "close_signature",
+                "in_amount", "cycle_frequency", "in_amount_per_cycle", "out_amount",
+                "open_block_time", "close_block_time", "open_block_number", "close_block_number",
+                "open_parent_slot", "close_parent_slot", "open_blockhash", "close_blockhash",
+                "open_previous_blockhash", "close_previous_blockhash", "opened_at", "closed_at"
+            ])
+
+            logger.info(f"Fetched {len(df)} rows of transactions.")
+            return df
+
+        except Exception as e:
+            logger.error(f"Error fetching recent transactions: {str(e)}")
+            logger.error("Error traceback: ", exc_info=True)
+            raise
+
+    def get_token_details(self, solana_address: str) -> Optional[Dict[str, Any]]:
+        """
+        Fetches token name, decimals, and is_suspicious status from the token_info table
+        for the given Solana address.
+
+        Args:
+            solana_address (str): The Solana address to query.
+
+        Returns:
+            Optional[Dict[str, Any]]: A dictionary with token information, or None if no match is found.
+        """
+        try:
+            logger.info(f"Fetching token info for Solana address: {solana_address}")
+
+            # Define the query
+            query = """
+                SELECT name, decimals, is_suspicious
+                FROM token_info
+                WHERE token = %s;
+            """
+
+            # Execute the query
+            with self.db.get_cursor() as cursor:
+                cursor.execute(query, (solana_address,))
+                result = cursor.fetchone()
+
+            # If no results, return None
+            if not result:
+                logger.warning(f"No token info found for Solana address: {solana_address}")
+                return None
+
+            # Format the result into a dictionary
+            token_info = {
+                "name": result["name"],
+                "decimals": result["decimals"],
+                "is_suspicious": result["is_suspicious"],
+            }
+
+            logger.info(f"Token info fetched successfully for {solana_address}: {token_info}")
+            return token_info
+
+        except Exception as e:
+            logger.error(f"Error fetching token info for {solana_address}: {str(e)}")
+            logger.error("Error traceback: ", exc_info=True)
+            raise
+
 
 
     def update_token_info_with_rate_limit(
@@ -462,7 +548,7 @@ class DatabaseQueries:
                 cur.execute("CALL process_dca_transactions_open();")
                 logger.info("Calling stored procedure: process_dca_transactions_close()")
                 cur.execute("CALL process_dca_transactions_close();")
-                logger.info("Calling stored procedure: process_dca_transactions_close()")
+                logger.info("Calling stored procedure: process_dca_transactions_closedca()")
                 cur.execute("CALL process_dca_transactions_closedca();")
             logger.info("Stored procedures executed successfully.")
         except Exception as e:
@@ -685,3 +771,47 @@ class DatabaseQueries:
             logger.error(f"Error fetching active users: {str(e)}")
             logger.error("Error traceback: ", exc_info=True)
             raise
+
+    def process_dextools_details(self, chain: str, address: str, api_url: str, api_key: str, rate_limit: float = 1.0) -> Optional[DexToolsTokenDetails]:
+        """
+        Fetches and processes additional token details from DexTools API for a given chain and address.
+        """
+        try:
+            # URLs for the endpoints
+            info_url = f"{api_url}/v2/token/{chain}/{address}/info"
+            price_url = f"{api_url}/v2/token/{chain}/{address}/price"
+
+            headers = {"X-API-KEY": api_key}
+
+            # Make API requests to fetch info and price
+            logger.info(f"Fetching token details for {address} on chain {chain}...")
+            logger.debug(f"Requesting info from: {info_url}")
+            info_response = requests.get(info_url, headers=headers)
+
+            # Respect rate limits
+            time.sleep(rate_limit)
+
+            logger.debug(f"Requesting price from: {price_url}")
+            price_response = requests.get(price_url, headers=headers)
+
+            # Handle responses
+            if info_response.status_code != 200 or price_response.status_code != 200:
+                logger.warning(f"Failed to fetch token details for {address}. Info status: {info_response.status_code}, Price status: {price_response.status_code}")
+                return None
+
+            # Parse JSON responses
+            info_data = info_response.json()
+            price_data = price_response.json()
+
+            # Check for empty data
+            if not info_data or not price_data:
+                logger.warning(f"Received empty data for token {address}. Info: {info_data}, Price: {price_data}")
+                return None
+
+            # Create and return a DexToolsTokenDetails instance
+            return DexToolsTokenDetails.from_dict(address, chain, info_data, price_data)
+
+        except Exception as e:
+            logger.error(f"Error processing token details for {address}: {str(e)}")
+            logger.error("Error traceback: ", exc_info=True)
+            return None

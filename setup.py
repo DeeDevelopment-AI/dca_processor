@@ -11,7 +11,8 @@ setup(
         "solana==0.36.1",
         "streamlit",
         "plotly",
-        "pandas"
+        "pandas",
+        "openpyxl"
     ],
     python_requires=">=3.8",
 )
