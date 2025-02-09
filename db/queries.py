@@ -2,6 +2,8 @@ from typing import List, Optional, Dict, Any
 from models import BlockGap, DCATransaction, DexToolsTokenInfo, DexToolsTokenDetails
 from db.connection import DatabaseConnection
 import time
+from time import sleep
+from tqdm import tqdm  # progress bar package
 import requests
 import logging
 import pandas as pd
@@ -560,7 +562,7 @@ class DatabaseQueries:
         Fetch rows from solana_dca_endandclose_trends and return them as a pandas DataFrame.
         We'll use the context manager from DatabaseConnection to get a cursor.
         """
-        query = "SELECT * FROM solana_dca_endandclose_trends;"
+        query = "SELECT * FROM solana_dca_endandclose;"
 
         # Use the context manager to execute the query
         with self.db.get_cursor() as cursor:
@@ -581,7 +583,7 @@ class DatabaseQueries:
                 user_address, 
                 COUNT(*) AS tx_count, 
                 SUM(out_amount) AS total_out 
-            FROM solana_dca_endandclose_trends
+            FROM jupiter_dca_transactions
             GROUP BY user_address
             ORDER BY tx_count DESC
             LIMIT %s;
@@ -596,22 +598,7 @@ class DatabaseQueries:
 
     def get_tokens_most_out_per_day(self, start_date=None, end_date=None):
         base_query = """
-            SELECT 
-                DATE_TRUNC('day', to_timestamp(scet.block_time)) AS day,
-                COALESCE(ti.name, ti.symbol, scet.output_mint) AS token_name,
-                COUNT(*) AS tx_count,
-                SUM(scet.out_amount) AS total_out
-            FROM solana_dca_endandclose_trends scet
-            INNER JOIN token_info ti 
-                ON scet.output_mint = ti.token
-            WHERE ti.is_suspicious = false
-              AND scet.output_mint NOT IN ('So1111111111', 'MintUSDC', 'MintUSDT')
-        """
-
-        # (Apply date filters, etc.)
-        base_query += """
-            GROUP BY 1,2
-            ORDER BY day ASC, tx_count DESC
+            SELECT * FROM jupiter_dca_transactions;
         """
 
         with self.db.get_cursor() as cursor:
@@ -631,40 +618,7 @@ class DatabaseQueries:
         Returns daily volumes for top N tokens by total volume.
         """
         query = """
-            WITH daily_token_volumes AS (
-                SELECT 
-                    DATE(block_time) as trade_date,
-                    output_mint,
-                    SUM(output_amount) as daily_volume
-                FROM solana_dca_endandclose_trends
-                WHERE block_time BETWEEN %s AND %s
-                AND output_mint NOT IN (
-                    'So11111111111111111111111111111111111111112',  -- SOL
-                    'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',  -- USDT
-                    'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'   -- USDC
-                )
-                GROUP BY DATE(block_time), output_mint
-            ),
-            token_total_volumes AS (
-                SELECT 
-                    output_mint,
-                    SUM(daily_volume) as total_volume
-                FROM daily_token_volumes
-                GROUP BY output_mint
-                ORDER BY total_volume DESC
-                LIMIT %s
-            )
-            SELECT 
-                dtv.trade_date,
-                COALESCE(ti.name, ti.symbol, dtv.output_mint) as token_name,
-                dtv.daily_volume
-            FROM daily_token_volumes dtv
-            INNER JOIN token_total_volumes ttv 
-                ON dtv.output_mint = ttv.output_mint
-            INNER JOIN token_info ti 
-                ON dtv.output_mint = ti.token
-            WHERE ti.is_suspicious = false
-            ORDER BY dtv.trade_date, total_volume DESC;
+            SELECT * FROM jupiter_dca_transactions;
         """
 
         with self.db.get_cursor() as cursor:
@@ -677,16 +631,7 @@ class DatabaseQueries:
         Returns the top 10 tokens by total sum of out_amount.
         """
         query = """
-            SELECT 
-                COALESCE(ti.name, ti.symbol, scet.output_mint) AS token_name,
-                SUM(scet.out_amount) AS total_out
-            FROM solana_dca_endandclose_trends scet
-            INNER JOIN token_info ti
-                   ON scet.output_mint = ti.token
-            WHERE ti.is_suspicious = false
-            GROUP BY token_name
-            ORDER BY total_out DESC
-            LIMIT 10;
+            SELECT * FROM jupiter_dca_transactions;
         """
         with self.db.get_cursor() as cursor:
             cursor.execute(query)
@@ -699,12 +644,7 @@ class DatabaseQueries:
         Returns the total daily volume (sum of out_amount) for all tokens.
         """
         query = """
-            SELECT
-                DATE_TRUNC('day', to_timestamp(block_time)) AS day,
-                SUM(out_amount) AS daily_volume
-            FROM solana_dca_endandclose_trends
-            GROUP BY 1
-            ORDER BY day;
+            SELECT * FROM jupiter_dca_transactions;
         """
         with self.db.get_cursor() as cursor:
             cursor.execute(query)
@@ -815,3 +755,86 @@ class DatabaseQueries:
             logger.error(f"Error processing token details for {address}: {str(e)}")
             logger.error("Error traceback: ", exc_info=True)
             return None
+
+# -------------------------------------------------------------------
+    def fetch_historical_price(self, token_mint, api_key):
+        """
+        Fetch the historical price data for a given token using the Birdeye API endpoint
+        /defi/history_price. The API call requests the price history from:
+            time_from = now - 188700 (seconds)
+            time_to   = now
+
+        Returns a DataFrame with historical snapshots sorted by unixTime or None if not found.
+        """
+        now = int(time.time())
+        time_from = now - 188700  # 188700 seconds before now
+        url = f"https://public-api.birdeye.so/defi/history_price?address={token_mint}&address_type=token&type=5m&time_from={time_from}&time_to={now}"
+        logger.info(f"fetch_historical_price: Requesting history for token '{token_mint}' from {time_from} to {now}.")
+        headers = {
+            "accept": "application/json",
+            "x-chain": "solana",
+            "X-API-KEY": api_key
+        }
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            if data.get("success") is True:
+                items = data.get("data", {}).get("items", [])
+                if items:
+                    df = pd.DataFrame(items)
+                    df = df.sort_values("unixTime")
+                    logger.info(f"fetch_historical_price: Retrieved {len(df)} price snapshots for token '{token_mint}'.")
+                    return df
+                else:
+                    logger.error(f"fetch_historical_price: No items found in API response for token '{token_mint}'. Response: {data}")
+                    return None
+            else:
+                logger.error(f"fetch_historical_price: API returned error for token '{token_mint}'. Response: {data}")
+                return None
+        except requests.RequestException as e:
+            logger.error(f"fetch_historical_price: Request error for token '{token_mint}': {e}")
+            return None
+
+    # -------------------------------------------------------------------
+    def fetch_token_details(self, chain_id, token_addresses, api_key):
+        """
+        Fetch token details from the Birdeye token overview endpoint.
+        For each token address, it sends a GET request to:
+          https://public-api.birdeye.so/defi/token_overview?address={token}
+        The chain is specified in the request headers.
+
+        Returns a DataFrame containing the details for all tokens.
+        """
+        logger.info(f"fetch_token_details: Starting to fetch details for {len(token_addresses)} tokens on chain '{chain_id}' using Birdeye API.")
+        token_details_list = []
+        # Filter out any None values
+        token_addresses = [address for address in token_addresses if address is not None]
+        for token in tqdm(token_addresses, desc='Fetching token details', unit='token'):
+            url = f"https://public-api.birdeye.so/defi/token_overview?address={token}"
+            headers = {
+                "accept": "application/json",
+                "x-chain": chain_id,
+                "X-API-KEY": api_key
+            }
+            logger.info(f"fetch_token_details: Fetching details for token: {token}")
+            try:
+                response = requests.get(url, headers=headers)
+                response.raise_for_status()
+                data = response.json()
+                if data.get("success") is True:
+                    token_data = data.get("data", {})
+                    # Ensure the 'address' field exists for merging later.
+                    if "address" not in token_data:
+                        token_data["address"] = token
+                    token_details_list.append(token_data)
+                    logger.info(f"fetch_token_details: Retrieved details for token: {token}")
+                else:
+                    logger.error(f"fetch_token_details: API returned error for token {token}. Response: {data}")
+                #sleep(0.2)  # avoid rate limiting
+            except requests.RequestException as e:
+                logger.error(f"fetch_token_details: Request error for token {token}: {e}")
+                #sleep(0.2)
+        token_details_df = pd.DataFrame(token_details_list)
+        logger.info("fetch_token_details: Finished fetching all token details.")
+        return token_details_df

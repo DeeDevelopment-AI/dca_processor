@@ -4,6 +4,24 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 
 @dataclass
+class TokenMetrics:
+    address: str
+    name: str
+    price: float
+    mcap: float
+    holders: int
+    output_count: int
+    input_count: int
+    distinct_output_users: int
+    distinct_input_users: int
+    total_out_amount: float
+    total_volume: float
+    variation_5m: float
+    variation_1h: float
+    variation_6h: float
+    variation_24h: float
+
+@dataclass
 class BlockInfo:
     block_height: int
     block_time: int
