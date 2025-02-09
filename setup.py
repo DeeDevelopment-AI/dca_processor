@@ -12,7 +12,8 @@ setup(
         "streamlit",
         "plotly",
         "pandas",
-        "openpyxl"
+        "openpyxl",
+        "tqdm"
     ],
     python_requires=">=3.8",
 )
