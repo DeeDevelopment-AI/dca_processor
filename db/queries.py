@@ -838,3 +838,155 @@ class DatabaseQueries:
         token_details_df = pd.DataFrame(token_details_list)
         logger.info("fetch_token_details: Finished fetching all token details.")
         return token_details_df
+
+    def fetch_and_store_token_security(self, tokens: list, api_key: str):
+        """
+        Calls the Birdeye API in batches for a list of tokens, inserts them in batches of 100,
+        and marks tokens as 'undefined' if no security data is found to avoid future API calls.
+        """
+        url_template = "https://public-api.birdeye.so/defi/token_security?address={}"
+        headers = {
+            "accept": "application/json",
+            "x-chain": "solana",
+            "X-API-KEY": api_key
+        }
+
+        batch_size = 100
+        token_batches = [tokens[i:i + batch_size] for i in range(0, len(tokens), batch_size)]
+
+        for batch_num, batch in enumerate(token_batches, start=1):
+            records = []
+            undefined_records = []
+            logger.info(f"Starting batch {batch_num}: Processing {len(batch)} tokens")
+
+            for token in batch:
+                try:
+                    url = url_template.format(token)
+                    logger.debug(f"Requesting security data for token: {token}")
+
+                    response = requests.get(url, headers=headers)
+
+                    if response.status_code == 555:
+                        logger.warning(f"API returned 555 for token {token}. Marking as undefined.")
+                        undefined_records.append({"token": token, "is_undefined": True})
+                        continue  # Skip to next token
+
+                    response.raise_for_status()
+                    data = response.json()
+
+                    if not data.get("success"):
+                        logger.warning(f"API call failed for token {token}: {data}")
+                        undefined_records.append({"token": token, "is_undefined": True})
+                        continue  # Skip this token
+
+                    token_data = data.get("data", {})
+                    logger.debug(f"API response for {token}: {json.dumps(token_data, indent=2)}")
+
+                    fields = {
+                        "token": token,
+                        "creator_address": token_data.get("creatorAddress"),
+                        "creator_owner_address": token_data.get("creatorOwnerAddress"),
+                        "owner_address": token_data.get("ownerAddress"),
+                        "owner_of_owner_address": token_data.get("ownerOfOwnerAddress"),
+                        "creation_tx": token_data.get("creationTx"),
+                        "creation_time": token_data.get("creationTime"),
+                        "creation_slot": token_data.get("creationSlot"),
+                        "mint_tx": token_data.get("mintTx"),
+                        "mint_time": token_data.get("mintTime"),
+                        "mint_slot": token_data.get("mintSlot"),
+                        "creator_balance": token_data.get("creatorBalance"),
+                        "owner_balance": token_data.get("ownerBalance"),
+                        "owner_percentage": token_data.get("ownerPercentage"),
+                        "creator_percentage": token_data.get("creatorPercentage"),
+                        "metaplex_update_authority": token_data.get("metaplexUpdateAuthority"),
+                        "metaplex_owner_update_authority": token_data.get("metaplexOwnerUpdateAuthority"),
+                        "metaplex_update_authority_balance": token_data.get("metaplexUpdateAuthorityBalance"),
+                        "metaplex_update_authority_percent": token_data.get("metaplexUpdateAuthorityPercent"),
+                        "mutable_metadata": token_data.get("mutableMetadata"),
+                        "top10_holder_balance": token_data.get("top10HolderBalance"),
+                        "top10_holder_percent": token_data.get("top10HolderPercent"),
+                        "top10_user_balance": token_data.get("top10UserBalance"),
+                        "top10_user_percent": token_data.get("top10UserPercent"),
+                        "is_true_token": token_data.get("isTrueToken"),
+                        "fake_token": token_data.get("fakeToken"),
+                        "total_supply": token_data.get("totalSupply"),
+                        "freezeable": token_data.get("freezeable"),
+                        "freeze_authority": token_data.get("freezeAuthority"),
+                        "transfer_fee_enable": token_data.get("transferFeeEnable"),
+                        "transfer_fee_data": token_data.get("transferFeeData"),
+                        "is_token_2022": token_data.get("isToken2022"),
+                        "non_transferable": token_data.get("nonTransferable"),
+                        "jup_strict_list": token_data.get("jupStrictList"),
+                        "pre_market_holder": json.dumps(token_data.get("preMarketHolder", None)),
+                        "lock_info": json.dumps(token_data.get("lockInfo", None)),
+                        "is_undefined": False  # Defined token
+                    }
+
+                    records.append(fields)
+
+                except requests.exceptions.RequestException as e:
+                    logger.error(f"API request error for token {token}: {str(e)}")
+                    undefined_records.append({"token": token, "is_undefined": True})
+                    continue  # Skip this token
+
+                except Exception as e:
+                    logger.error(f"Unexpected error for token {token}: {str(e)}", exc_info=True)
+                    undefined_records.append({"token": token, "is_undefined": True})
+                    continue  # Skip this token
+
+            # Insert valid records
+            if records:
+                try:
+                    with self.db.get_cursor() as cursor:
+                        query = """
+                            INSERT INTO token_security (
+                                token, creator_address, creator_owner_address, owner_address, owner_of_owner_address,
+                                creation_tx, creation_time, creation_slot, mint_tx, mint_time, mint_slot,
+                                creator_balance, owner_balance, owner_percentage, creator_percentage,
+                                metaplex_update_authority, metaplex_owner_update_authority,
+                                metaplex_update_authority_balance, metaplex_update_authority_percent,
+                                mutable_metadata, top10_holder_balance, top10_holder_percent,
+                                top10_user_balance, top10_user_percent, is_true_token, fake_token,
+                                total_supply, pre_market_holder, lock_info, freezeable, freeze_authority,
+                                transfer_fee_enable, transfer_fee_data, is_token_2022, non_transferable,
+                                jup_strict_list, is_undefined, updated_at
+                            )
+                            VALUES (
+                                %(token)s, %(creator_address)s, %(creator_owner_address)s, %(owner_address)s, %(owner_of_owner_address)s,
+                                %(creation_tx)s, %(creation_time)s, %(creation_slot)s, %(mint_tx)s, %(mint_time)s, %(mint_slot)s,
+                                %(creator_balance)s, %(owner_balance)s, %(owner_percentage)s, %(creator_percentage)s,
+                                %(metaplex_update_authority)s, %(metaplex_owner_update_authority)s,
+                                %(metaplex_update_authority_balance)s, %(metaplex_update_authority_percent)s,
+                                %(mutable_metadata)s, %(top10_holder_balance)s, %(top10_holder_percent)s,
+                                %(top10_user_balance)s, %(top10_user_percent)s, %(is_true_token)s, %(fake_token)s,
+                                %(total_supply)s, %(pre_market_holder)s, %(lock_info)s, %(freezeable)s, %(freeze_authority)s,
+                                %(transfer_fee_enable)s, %(transfer_fee_data)s, %(is_token_2022)s, %(non_transferable)s,
+                                %(jup_strict_list)s, %(is_undefined)s, NOW()
+                            )
+                            ON CONFLICT (token) DO NOTHING;
+                        """
+                        cursor.executemany(query, records)  # Batch insert
+
+                    logger.info(f"Batch {batch_num} successfully inserted into the database.")
+
+                except Exception as e:
+                    logger.error(f"Database insert error: {str(e)}", exc_info=True)
+
+            # Insert undefined tokens
+            if undefined_records:
+                try:
+                    with self.db.get_cursor() as cursor:
+                        query = """
+                            INSERT INTO token_security (token, is_undefined, updated_at)
+                            VALUES (%(token)s, %(is_undefined)s, NOW())
+                            ON CONFLICT (token) DO NOTHING;
+                        """
+                        cursor.executemany(query, undefined_records)  # Batch insert
+
+                    logger.info(f"Marked {len(undefined_records)} tokens as 'undefined'.")
+
+                except Exception as e:
+                    logger.error(f"Database insert error for undefined tokens: {str(e)}", exc_info=True)
+
+            logger.info("Sleeping for 1 second to prevent DB overload...")
+            time.sleep(5)

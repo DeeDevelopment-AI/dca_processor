@@ -52,7 +52,7 @@ def main():
 
         # (2) Fetch recent transactions (e.g., from the past 6 hours)
         logger.info("main: Fetching recent transactions...")
-        transactions_df = db_queries.get_recent_transactions(n=3)
+        transactions_df = db_queries.get_recent_transactions(n=5)
         logger.info(f"main: Fetched {len(transactions_df)} transactions.")
 
         # (3) Fetch token details once using the Birdeye API
@@ -154,7 +154,8 @@ def main():
             os.makedirs(output_folder)
             logger.info(f"main: Created output folder '{output_folder}'.")
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # Generate Excel filename using epoch time
+        timestamp = int(datetime.now().timestamp())  # Convert current time to epoch
         excel_filename = f"final_aggregated_token_details_{timestamp}.xlsx"
         output_path = os.path.join(output_folder, excel_filename)
 
@@ -162,6 +163,7 @@ def main():
         final_df.to_excel(output_path, index=False)
         logger.info("main: Final Excel file written successfully.")
         print(final_df)
+
 
     except Exception as e:
         logger.error(f"main: An error occurred: {e}", exc_info=True)
