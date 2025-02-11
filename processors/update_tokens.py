@@ -5,6 +5,8 @@ from config import load_config
 import logging
 import sys
 import time
+from time import sleep
+
 
 logging.basicConfig(
     level=logging.INFO,
