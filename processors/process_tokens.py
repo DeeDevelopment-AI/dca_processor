@@ -7,6 +7,8 @@ from tqdm import tqdm
 from db.connection import DatabaseConnection
 from db.queries import DatabaseQueries
 from config import load_config
+from datetime import datetime, timezone
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -22,6 +24,20 @@ PROCESSED_DIR = "./data/processed"
 
 # Ensure processed folder exists
 os.makedirs(PROCESSED_DIR, exist_ok=True)
+
+
+def should_process_file(epoch_time):
+    """Check if 24 hours have passed since the timestamp in the filename."""
+    if epoch_time is None:
+        return False
+
+    current_time = int(datetime.now(timezone.utc).timestamp())
+
+    if current_time >= epoch_time + (24 * 60 * 60):  # 24 hours have passed
+        return True
+
+    logger.info(f"Skipping file: epoch time {epoch_time} is not older than 24 hours (Current time: {current_time})")
+    return False
 
 def extract_epoch_from_filename(file_path):
     """Extract the epoch timestamp from the filename after the last underscore."""
@@ -99,10 +115,11 @@ def calculate_percentage_changes(original_price, max_prices):
 
 
 def process_file(file_path, api_key):
-    """Process a single file to fetch historical prices and save the enriched data independently."""
+    """Process a single file only if 24 hours have passed since its epoch timestamp."""
     epoch_time = extract_epoch_from_filename(file_path)
-    if epoch_time is None:
-        logger.error(f"Skipping file {file_path} due to invalid epoch timestamp.")
+
+    # Ensure the file should be processed
+    if not should_process_file(epoch_time):
         return
 
     try:
@@ -153,6 +170,10 @@ def process_file(file_path, api_key):
         df_new.to_excel(output_file, index=False)
 
         logger.info(f"Saved processed data to {output_file}")
+
+        # Remove the original file after successful processing
+        os.remove(file_path)
+        logger.info(f"Deleted original file: {file_path}")
 
     except Exception as e:
         logger.error(f"Error processing {file_path}: {e}", exc_info=True)
