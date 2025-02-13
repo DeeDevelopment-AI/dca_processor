@@ -52,7 +52,7 @@ def main():
 
         # (2) Fetch recent transactions (e.g., from the past 6 hours)
         logger.info("main: Fetching recent transactions...")
-        transactions_df = db_queries.get_recent_transactions(n=12)
+        transactions_df = db_queries.get_recent_transactions(n=2)
         logger.info(f"main: Fetched {len(transactions_df)} transactions.")
 
         # (3) Fetch token details once using the Birdeye API
