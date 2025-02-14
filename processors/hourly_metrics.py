@@ -138,9 +138,9 @@ def main():
         final_df = pd.merge(aggregated, token_details_df, left_on="token", right_on="address", how="left")
 
         # (10) Format dollars columns to use a comma as the decimal separator
-        logger.info("main: Formatting dollar values with comma as decimal separator...")
-        final_df["dollars_sold"] = final_df["dollars_sold"].apply(lambda x: f"{x:.2f}".replace('.',','))
-        final_df["dollars_bought"] = final_df["dollars_bought"].apply(lambda x: f"{x:.2f}".replace('.',','))
+        #logger.info("main: Formatting dollar values with comma as decimal separator...")
+        #final_df["dollars_sold"] = final_df["dollars_sold"].apply(lambda x: f"{x:.2f}".replace('.',','))
+        #final_df["dollars_bought"] = final_df["dollars_bought"].apply(lambda x: f"{x:.2f}".replace('.',','))
 
         # (11) Remove timezone information for Excel compatibility
         for col in transactions_df.select_dtypes(include=["datetimetz"]).columns:
@@ -156,12 +156,12 @@ def main():
 
         # Generate Excel filename using epoch time
         timestamp = int(datetime.now().timestamp())  # Convert current time to epoch
-        excel_filename = f"final_aggregated_token_details_{timestamp}.xlsx"
-        output_path = os.path.join(output_folder, excel_filename)
+        csv_filename = f"final_aggregated_token_details_{timestamp}.csv"
+        output_path = os.path.join(output_folder, csv_filename)
 
         logger.info(f"main: Writing final aggregated token details to Excel file at '{output_path}'...")
-        final_df.to_excel(output_path, index=False)
-        logger.info("main: Final Excel file written successfully.")
+        final_df.to_csv(output_path, index=False)
+        logger.info("main: Final CSV file written successfully.")
         print(final_df)
 
 

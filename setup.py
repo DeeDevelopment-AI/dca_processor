@@ -13,7 +13,8 @@ setup(
         "plotly",
         "pandas",
         "openpyxl",
-        "tqdm"
+        "tqdm",
+        "google-cloud-aiplatform"
     ],
     python_requires=">=3.8",
 )
